@@ -1,11 +1,11 @@
 package edu.jsu.mcis.cs310.tas_sp22;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 public class Employee 
 {
     private int id,emptype,dept, shiftid;
-    private LocalTime active, inactive;
+    private LocalDateTime active, inactive;
     private String badgeid,first,middle,last;
 
     public Employee(HashMap <String, String> data)
@@ -18,8 +18,8 @@ public class Employee
         this.emptype = Integer.parseInt(data.get("employeetypeid"));
         this.dept = Integer.parseInt(data.get("departmentid"));
         this.shiftid = Integer.parseInt(data.get("shiftid"));
-        this.active = LocalTime.parse(data.get("active"));
-        this.inactive = LocalTime.parse(data.get("active"));
+        this.active = LocalDateTime.parse(data.get("active"));
+        this.inactive = LocalDateTime.parse(data.get("inactive"));
         
     }
 
@@ -56,11 +56,11 @@ public class Employee
         return shiftid;
     }
 
-    public LocalTime getActive() {
+    public LocalDateTime getActive() {
         return active;
     }
 
-    public LocalTime getInactive() {
+    public LocalDateTime getInactive() {
         return inactive;
     }
     
@@ -70,8 +70,8 @@ public class Employee
     public String toString() {    
         StringBuilder result = new StringBuilder();
         result.append("#").append(id).append(" (").append(last).append(", ").append(first).append(" ").append(middle)
-        .append("): employeetypeid: ").append(emptype).append(", departmentid: ").append(dept).append(", shiftid: ")
-        .append(shiftid).append(", active: ").append(active).append(", inactive: ").append(inactive);
+            .append("): employeetypeid: ").append(emptype).append(", departmentid: ").append(dept).append(", shiftid: ")
+            .append(shiftid).append(", active: ").append(active).append(", inactive: ").append(inactive);
       
         
         return result.toString();  
