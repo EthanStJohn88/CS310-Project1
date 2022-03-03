@@ -5,6 +5,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 class TASDatabase {
     
@@ -13,7 +14,8 @@ class TASDatabase {
     private PreparedStatement pstSelect = null, pstUpdate = null;    
     private boolean hasresults;
     private int updateCount;    
-    
+    private DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+
     public TASDatabase()
     {
         try
@@ -184,8 +186,8 @@ class TASDatabase {
                 shift.put("employeetypeid", resultset.getString("employeetypeid"));
                 shift.put("departmentid", resultset.getString("departmentid"));
                 shift.put("shiftid", resultset.getString("shiftid"));
-                shift.put("active", resultset.getString("active")); //Gets just the Date, Not the Time
-                shift.put("inactive", resultset.getString("inactive")); //inactives all set to null?
+                shift.put("active", String.valueOf(resultset.getTimestamp("active").toLocalDateTime()));
+                shift.put("inactive", String.valueOf(resultset.getTimestamp("inactive").toLocalDateTime())); //Inactive is set to null, causes error
                 
                 outputEmployee = new Employee(shift);
             }
@@ -221,8 +223,8 @@ class TASDatabase {
                 shift.put("employeetypeid", resultset.getString("employeetypeid"));
                 shift.put("departmentid", resultset.getString("departmentid"));
                 shift.put("shiftid", resultset.getString("shiftid"));
-                shift.put("active", resultset.getString("active")); //Gets just the Date, Not the Time
-                shift.put("inactive", resultset.getString("inactive")); //inactives all set to null?
+                shift.put("active", String.valueOf(resultset.getTimestamp("active").toLocalDateTime()));
+                shift.put("inactive", String.valueOf(resultset.getTimestamp("inactive").toLocalDateTime())); //Inactive is set to null, causes error
                 
                 outputEmployee = new Employee(shift);
             }
@@ -253,7 +255,7 @@ class TASDatabase {
                 shift.put("terminalid", resultset.getString("terminalid"));
                 shift.put("eventtypeid", resultset.getString("eventtypeid"));
                 shift.put("badgeid", resultset.getString("badgeid"));
-                shift.put("timestamp", resultset.getString("timestamp")); //Use LocalDateTime parse with formatter?
+                shift.put("timestamp", String.valueOf(resultset.getTimestamp("timestamp").toLocalDateTime())); //Use LocalDateTime parse with formatter?
                 
                 HashMap<String, String> params = new HashMap<>();
                 shift.put("id", resultset.getString("badge.id"));

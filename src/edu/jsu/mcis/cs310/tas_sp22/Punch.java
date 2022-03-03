@@ -3,6 +3,8 @@ package edu.jsu.mcis.cs310.tas_sp22;
 import java.util.HashMap;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;  
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 public class Punch {
     
@@ -57,8 +59,9 @@ public class Punch {
     public String printOriginal() {
         StringBuilder result = new StringBuilder();
         
-        result.append("#").append(badgeid).append(" ").append(punchtypeid)
-            .append(": ").append(timestamp.getDayOfWeek()).append(" ").append(timestamp.format(format));
+        result.append("#").append(badgeid).append(" ").append(punchtypeid).append(": ")
+            .append(timestamp.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.US).toUpperCase())
+            .append(" ").append(timestamp.format(format));
         
         return result.toString();
     }
