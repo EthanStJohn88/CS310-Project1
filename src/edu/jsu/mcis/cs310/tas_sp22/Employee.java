@@ -19,7 +19,12 @@ public class Employee
         this.dept = Integer.parseInt(data.get("departmentid"));
         this.shiftid = Integer.parseInt(data.get("shiftid"));
         this.active = LocalDateTime.parse(data.get("active"));
-        this.inactive = LocalDateTime.parse(data.get("inactive"));
+        if(data.get("inactive") == "none" || data.get("inactive") == null ){
+            this.inactive = null;
+        }
+        else{
+            this.inactive = LocalDateTime.parse(data.get("inactive")); //Null in database
+        }
         
     }
 
@@ -69,11 +74,17 @@ public class Employee
     @Override
     public String toString() {    
         StringBuilder result = new StringBuilder();
-        result.append("#").append(id).append(" (").append(last).append(", ").append(first).append(" ").append(middle)
+        result.append("#").append(badgeid).append(" (").append(last).append(", ").append(first).append(" ").append(middle)
             .append("): employeetypeid: ").append(emptype).append(", departmentid: ").append(dept).append(", shiftid: ")
-            .append(shiftid).append(", active: ").append(active).append(", inactive: ").append(inactive);
+            .append(shiftid).append(", active: ").append(active.toLocalDate()).append(", inactive: ");
       
-        
+        if(inactive == null){
+            result.append("none");
+        }
+        else{
+            result.append(inactive);
+        }
+            
         return result.toString();  
     }
 

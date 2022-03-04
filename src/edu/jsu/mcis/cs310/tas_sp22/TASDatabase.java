@@ -187,7 +187,12 @@ class TASDatabase {
                 shift.put("departmentid", resultset.getString("departmentid"));
                 shift.put("shiftid", resultset.getString("shiftid"));
                 shift.put("active", String.valueOf(resultset.getTimestamp("active").toLocalDateTime()));
-                shift.put("inactive", String.valueOf(resultset.getTimestamp("inactive").toLocalDateTime())); //Inactive is set to null, causes error
+                if(resultset.getString("inactive") == "none" || resultset.getTimestamp("inactive") == null){
+                    shift.put("inactive", resultset.getString("inactive"));
+                }
+                else{
+                    shift.put("active", String.valueOf(resultset.getTimestamp("inactive").toLocalDateTime()));
+                }
                 
                 outputEmployee = new Employee(shift);
             }
@@ -224,8 +229,12 @@ class TASDatabase {
                 shift.put("departmentid", resultset.getString("departmentid"));
                 shift.put("shiftid", resultset.getString("shiftid"));
                 shift.put("active", String.valueOf(resultset.getTimestamp("active").toLocalDateTime()));
-                shift.put("inactive", String.valueOf(resultset.getTimestamp("inactive").toLocalDateTime())); //Inactive is set to null, causes error
-                
+                if(resultset.getString("inactive") == "none" || resultset.getTimestamp("inactive") == null){
+                    shift.put("inactive", resultset.getString("inactive"));
+                }
+                else{
+                    shift.put("active", String.valueOf(resultset.getTimestamp("inactive").toLocalDateTime()));
+                }                
                 outputEmployee = new Employee(shift);
             }
         }
