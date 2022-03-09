@@ -10,7 +10,7 @@ public class Punch {
     
     private int terminalid, id;
     private PunchType punchtypeid;
-    private String adjustmenttype, badgeid;
+    private String adjustmenttype;
     private LocalDateTime timestamp;
     private Badge badge;
     private DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
@@ -19,16 +19,18 @@ public class Punch {
         this.terminalid = Integer.parseInt(params.get("terminalid"));
         this.punchtypeid = PunchType.values()[Integer.parseInt(params.get("eventtypeid"))];
         this.id = 0;
-        this.badgeid = params.get("badgeid");
         this.adjustmenttype = null;
         this.badge = empbadge;
-        if(params.get("timestamp") != null){
-            this.timestamp = LocalDateTime.parse(params.get("timestamp"));
-        }
-        else{
-            this.timestamp = LocalDateTime.now();
-        }
-        
+        this.timestamp = LocalDateTime.parse(params.get("timestamp"));
+    }
+    
+    public Punch(int terminalid, Badge empbadge, int eventtypeid){
+        this.terminalid = terminalid;
+        this.punchtypeid = PunchType.values()[eventtypeid];
+        this.id = 0;
+        this.adjustmenttype = null;
+        this.badge = empbadge;
+        this.timestamp = LocalDateTime.now();
     }
     
 
@@ -36,7 +38,7 @@ public class Punch {
         return terminalid;
     }
 
-    public PunchType getPunchtypeid() {
+    public PunchType getPunchtype() {
         return punchtypeid;
     }
 
@@ -48,18 +50,18 @@ public class Punch {
         return adjustmenttype;
     }
 
-    public String getBadgeid() {
-        return badgeid;
+    public LocalDateTime getOriginalTimestamp() {
+        return timestamp;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public Badge getBadge() {
+        return badge;
     }
 
     public String printOriginal() {
         StringBuilder result = new StringBuilder();
         
-        result.append("#").append(badgeid).append(" ").append(punchtypeid).append(": ")
+        result.append("#").append(badge.getId()).append(" ").append(punchtypeid).append(": ")
             .append(timestamp.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.US).toUpperCase())
             .append(" ").append(timestamp.format(format));
         

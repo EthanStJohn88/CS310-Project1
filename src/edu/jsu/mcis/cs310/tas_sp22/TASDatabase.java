@@ -74,7 +74,7 @@ class TASDatabase {
                 resultset.next();
                 
                 HashMap<String, String> shift = new HashMap<>();
-                shift.put("id", id);
+                shift.put("id", resultset.getString("id"));
                 shift.put("description", resultset.getString("description"));
                 
                 outputBadge = new Badge(shift);
@@ -246,7 +246,6 @@ class TASDatabase {
     
     public Punch getPunch(int id){
         Punch outputPunch = null;
-        Badge badge;
         
         try{
             query = "SELECT * FROM event JOIN badge ON event.badgeid = badge.id WHERE event.id = ?;";
@@ -260,25 +259,81 @@ class TASDatabase {
                 
                 resultset.next();
                 
-                HashMap<String, String> shift = new HashMap<>();
-                shift.put("terminalid", resultset.getString("terminalid"));
-                shift.put("eventtypeid", resultset.getString("eventtypeid"));
-                shift.put("badgeid", resultset.getString("badgeid"));
-                shift.put("timestamp", String.valueOf(resultset.getTimestamp("timestamp").toLocalDateTime())); //Use LocalDateTime parse with formatter?
-                
                 HashMap<String, String> params = new HashMap<>();
-                shift.put("id", resultset.getString("badge.id"));
-                shift.put("description", resultset.getString("description"));
-                
-                badge = new Badge(params);
-                
-                outputPunch = new Punch(shift, badge);
+                params.put("terminalid", resultset.getString("terminalid"));
+                params.put("eventtypeid", resultset.getString("eventtypeid"));
+                params.put("timestamp", String.valueOf(resultset.getTimestamp("timestamp").toLocalDateTime()));
+
+                outputPunch = new Punch(params, getBadge(resultset.getString("badgeid")));
             }
         }
         catch(SQLException e){ System.out.println("Error in badge getPunch() " + e);
         }
         
         return outputPunch;
+    }
+    
+    public Department getDepartment(int id){
+        Department outputDept = null;
+        
+        try{
+            query = "SELECT * FROM department WHERE id = ?;";
+            pstSelect = conn.prepareStatement(query);
+            pstSelect.setInt(1, id);
+            
+            hasresults = pstSelect.execute();
+            
+            if(hasresults){
+                ResultSet resultset = pstSelect.getResultSet();
+                
+                resultset.next();
+                
+                HashMap<String, String> shift = new HashMap<>();
+                shift.put("id", resultset.getString("id"));
+                shift.put("terminalid", resultset.getString("terminalid"));
+                shift.put("description", resultset.getString("description"));
+                
+                outputDept = new Department(shift);
+            }
+        }
+        catch(SQLException e){ System.out.println("Error in badge getPunch() " + e);
+        }
+        
+        return outputDept;
+    }
+    
+    public int insertPunch(Punch punch){
+        int newID = 0, result = 0;
+        Badge badge = getBadge(punch.getBadge().getId());
+        Employee employee = getEmployee(badge);
+        ResultSet keys;
+        Department department = getDepartment(employee.getDeptid());
+        
+        if(punch.getTerminalid() == department.getTerminalid() || punch.getTerminalid() == 0){
+            try{
+                query = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?, ?, ?, ?);";
+                pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+                pstSelect.setInt(1, punch.getTerminalid());
+                pstSelect.setString(2, punch.getBadge().getId());
+                pstSelect.setString(3, String.valueOf(punch.getOriginalTimestamp()));
+                pstSelect.setInt(4, punch.getPunchtype().ordinal());
+                
+                result = pstSelect.executeUpdate();
+                
+                if (result == 1) {
+                    keys = pstSelect.getGeneratedKeys();
+                    if (keys.next()) {
+                       newID = keys.getInt(1);
+                    }
+                }
+                
+            }
+            catch(SQLException e){ 
+                System.out.println("Error in insertPunch() " + e);
+            }
+        }
+        
+        return newID;
     }
     
 }
