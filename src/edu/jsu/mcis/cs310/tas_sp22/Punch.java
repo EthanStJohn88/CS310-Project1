@@ -68,5 +68,13 @@ public class Punch {
         return result.toString();
     }
     
+    /* Created adjust method which needs to implemented for Feature 4 */
+    public void adjust(Shift s) {
+        
+    }
     
+    /* Created printAdjusted method which needs to implemented for Feature 4 */
+    public String printAdjusted() {
+        return null;
+    }
 }

@@ -2,10 +2,12 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 class TASDatabase {
     
@@ -336,4 +338,8 @@ class TASDatabase {
         return newID;
     }
     
+    /* Created getDailyPunchList method which needs to implemented for Feature 3 */
+    public ArrayList<Punch> getDailyPunchList(Badge b, LocalDate ts) {
+        return null;
+    }
 }
