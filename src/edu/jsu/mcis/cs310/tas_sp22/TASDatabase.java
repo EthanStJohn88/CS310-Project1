@@ -3,7 +3,6 @@ package edu.jsu.mcis.cs310.tas_sp22;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -246,7 +245,7 @@ class TASDatabase {
         return outputEmployee;
     }
     
-    public Punch getPunch(int id){
+    public Punch getPunch(int id) {
         Punch outputPunch = null;
         
         try{
@@ -262,9 +261,10 @@ class TASDatabase {
                 resultset.next();
                 
                 HashMap<String, String> params = new HashMap<>();
+                params.put("id", String.valueOf(id));
                 params.put("terminalid", resultset.getString("terminalid"));
                 params.put("eventtypeid", resultset.getString("eventtypeid"));
-                params.put("timestamp", String.valueOf(resultset.getTimestamp("timestamp").toLocalDateTime()));
+                params.put("timestamp", resultset.getTimestamp("timestamp").toLocalDateTime().toString());
 
                 outputPunch = new Punch(params, getBadge(resultset.getString("badgeid")));
             }
@@ -305,7 +305,7 @@ class TASDatabase {
     }
     
     public int insertPunch(Punch punch){
-        int newID = 0, result = 0;
+        int newID = 0;
         Badge badge = getBadge(punch.getBadge().getId());
         Employee employee = getEmployee(badge);
         ResultSet keys;
@@ -317,10 +317,10 @@ class TASDatabase {
                 pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
                 pstSelect.setInt(1, punch.getTerminalid());
                 pstSelect.setString(2, punch.getBadge().getId());
-                pstSelect.setString(3, String.valueOf(punch.getOriginalTimestamp()));
+                pstSelect.setString(3, punch.getOriginalTimestamp().toString());
                 pstSelect.setInt(4, punch.getPunchtype().ordinal());
                 
-                result = pstSelect.executeUpdate();
+                int result = pstSelect.executeUpdate();
                 
                 if (result == 1) {
                     keys = pstSelect.getGeneratedKeys();
@@ -338,8 +338,30 @@ class TASDatabase {
         return newID;
     }
     
-    /* Created getDailyPunchList method which needs to implemented for Feature 3 */
-    public ArrayList<Punch> getDailyPunchList(Badge b, LocalDate ts) {
-        return null;
+    public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate date) {
+        ArrayList<Punch> Punchlist = null;
+        //Query and filling of Arraylist
+        try{
+            query = "SELECT * FROM event WHERE (badgeid = ? AND timestamp = ?) OR (badgeid = ? AND timestamp = ?) ORDER BY timestamp;";
+            pstSelect = conn.prepareStatement(query);
+            pstSelect.setString(1, badge.getId());
+            pstSelect.setTimestamp(2, Timestamp.valueOf(String.valueOf(date)));
+            pstSelect.setString(3, badge.getId());
+            pstSelect.setTimestamp(4, Timestamp.valueOf(String.valueOf(date.plusDays(1))));
+            
+            hasresults = pstSelect.execute();
+            
+            if(hasresults){
+                ResultSet resultset = pstSelect.getResultSet();
+                
+                resultset.next();
+            }
+        }
+        catch(SQLException e){ 
+                System.out.println("Error in getDailyPunchList() " + e);
+            }
+        
+        
+        return Punchlist;
     }
 }

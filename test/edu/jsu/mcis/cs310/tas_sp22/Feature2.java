@@ -67,11 +67,11 @@ public class Feature2 {
         ots = p1.getOriginalTimestamp();
         int terminalid = p1.getTerminalid();
         PunchType punchtype = p1.getPunchtype();
-		
+
         /* Insert Punch Into Database */
         
         int punchid = db.insertPunch(p1);
-		
+        
         /* Retrieve New Punch */
         
         Punch p2 = db.getPunch(punchid);

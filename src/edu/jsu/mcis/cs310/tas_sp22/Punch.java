@@ -11,14 +11,13 @@ public class Punch {
     private int terminalid, id;
     private PunchType punchtypeid;
     private String adjustmenttype;
-    private LocalDateTime timestamp;
+    private final LocalDateTime timestamp;
     private Badge badge;
-    private DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
 
     public Punch(HashMap<String, String> params, Badge empbadge) { 
         this.terminalid = Integer.parseInt(params.get("terminalid"));
         this.punchtypeid = PunchType.values()[Integer.parseInt(params.get("eventtypeid"))];
-        this.id = 0;
+        this.id = Integer.parseInt(params.get("id"));
         this.adjustmenttype = null;
         this.badge = empbadge;
         this.timestamp = LocalDateTime.parse(params.get("timestamp"));
@@ -30,7 +29,7 @@ public class Punch {
         this.id = 0;
         this.adjustmenttype = null;
         this.badge = empbadge;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now().withNano(0);
     }
     
 
@@ -59,13 +58,14 @@ public class Punch {
     }
 
     public String printOriginal() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
+        
         StringBuilder result = new StringBuilder();
         
         result.append("#").append(badge.getId()).append(" ").append(punchtypeid).append(": ")
-            .append(timestamp.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.US).toUpperCase())
-            .append(" ").append(timestamp.format(format));
+            .append(dtf.format(timestamp));
         
-        return result.toString();
+        return result.toString().toUpperCase();
     }
     
     /* Created adjust method which needs to implemented for Feature 4 */
