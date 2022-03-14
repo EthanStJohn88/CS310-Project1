@@ -12,6 +12,8 @@ public class Punch {
     private PunchType punchtypeid;
     private String adjustmenttype;
     private final LocalDateTime timestamp;
+    private LocalDateTime adjustedtimestamp;
+    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
     private Badge badge;
 
     public Punch(HashMap<String, String> params, Badge empbadge) { 
@@ -58,14 +60,12 @@ public class Punch {
     }
 
     public String printOriginal() {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
-        
         StringBuilder result = new StringBuilder();
         
         result.append("#").append(badge.getId()).append(" ").append(punchtypeid).append(": ")
-            .append(dtf.format(timestamp));
+            .append(dtf.format(timestamp).toUpperCase());
         
-        return result.toString().toUpperCase();
+        return result.toString();
     }
     
     /* Created adjust method which needs to implemented for Feature 4 */
@@ -75,6 +75,11 @@ public class Punch {
     
     /* Created printAdjusted method which needs to implemented for Feature 4 */
     public String printAdjusted() {
-        return null;
+        StringBuilder result = new StringBuilder();
+        
+        result.append("#").append(badge.getId()).append(" ").append(punchtypeid).append(": ")
+            .append(dtf.format(adjustedtimestamp).toUpperCase()).append(" (").append(adjustmenttype).append(")");
+        
+        return result.toString();
     }
 }

@@ -339,22 +339,40 @@ class TASDatabase {
     }
     
     public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate date) {
-        ArrayList<Punch> Punchlist = null;
+        ArrayList<Punch> Punchlist = new ArrayList<Punch>();
         //Query and filling of Arraylist
         try{
-            query = "SELECT * FROM event WHERE (badgeid = ? AND timestamp = ?) OR (badgeid = ? AND timestamp = ?) ORDER BY timestamp;";
+            query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? HAVING tsdate = ? ORDER BY timestamp;";
             pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
-            pstSelect.setTimestamp(2, Timestamp.valueOf(String.valueOf(date)));
-            pstSelect.setString(3, badge.getId());
-            pstSelect.setTimestamp(4, Timestamp.valueOf(String.valueOf(date.plusDays(1))));
+            pstSelect.setString(2, String.valueOf(date));
             
             hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
                 
-                resultset.next();
+                while(resultset.next()){
+                    int id = resultset.getInt("id");
+                    Punch p = getPunch(id);
+                    Punchlist.add(p);
+                }
+                
+            }
+            
+            query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? AND eventtype !=  HAVING tsdate = ? ORDER BY timestamp;";
+            pstSelect = conn.prepareStatement(query);
+            pstSelect.setString(1, badge.getId());
+            pstSelect.setInt(2, 1);
+            pstSelect.setString(3, String.valueOf(date.plusDays(1)));
+            
+            hasresults = pstSelect.execute();
+            
+            if(hasresults){
+                ResultSet resultset = pstSelect.getResultSet();
+                int id = resultset.getInt("id");
+                Punch p = getPunch(id);
+                Punchlist.add(p);
             }
         }
         catch(SQLException e){ 
