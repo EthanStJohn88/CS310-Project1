@@ -212,7 +212,7 @@ public class Punch {
         StringBuilder result = new StringBuilder();
         
         result.append("#").append(badge.getId()).append(" ").append(punchtypeid).append(": ")
-            .append(dtf.format(adjustedtimestamp).toUpperCase()).append(" (").append(adjustmenttype).append(")");
+            .append(dtf.format(adjustedtimestamp).toUpperCase()).append(" ").append(adjustmenttype);
         
         return result.toString();
     }
