@@ -1,8 +1,14 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TAS {
+    
+    public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
+        
+        return 0;
+    }
 
     public static void main(String[] args) {
         final String username = "tasuser";
