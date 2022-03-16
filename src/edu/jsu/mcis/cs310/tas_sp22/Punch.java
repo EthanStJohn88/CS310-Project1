@@ -14,13 +14,13 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 public class Punch {
     
     private int terminalid, id, eventtypeid;
-    private PunchType punchtypeid;
+    private final PunchType punchtypeid;
     private String adjustmenttype;
     private final LocalDateTime timestamp;
     private LocalDateTime adjustedtimestamp;
-    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
-    private Badge badge;
-    private LocalTime time, adjustedtime;
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
+    private final Badge badge;
+    private LocalTime adjustedtime;
 
     public Punch(HashMap<String, String> params, Badge empbadge) { 
         this.terminalid = Integer.parseInt(params.get("terminalid"));
@@ -79,7 +79,7 @@ public class Punch {
         return result.toString();
     }
     
-        public LocalTime roundInterval(int roundinterval, LocalTime time) {
+    public LocalTime roundInterval(int roundinterval, LocalTime time) {
         int minutes = time.getMinute();
         int remainder = minutes % roundinterval; 
 
@@ -101,22 +101,21 @@ public class Punch {
         int roundInt = s.getRoundInterval();
         int gracePeriod = s.getGracePeriod();
         int dockPenalty = s.getTimeDock();
-        int lunchDock = s.getLunchTimeDock();
         
         
         LocalTime time = getOriginalTimestamp().toLocalTime();
-        adjustmenttype = "(None)";
+        adjustmenttype = "None";
         int timediff = 0;
         
         if (timestamp.get(ChronoField.DAY_OF_WEEK) == 6 || timestamp.get(ChronoField.DAY_OF_WEEK) == 7) {
         adjustedtime = roundInterval(roundInt,time);
-        adjustmenttype = "(Interval Round)";
+        adjustmenttype = "Interval Round";
             
         }
         
         else {
 
-            if (getEventTypeId() == 1) { 
+            if (punchtypeid == PunchType.CLOCK_IN) { 
 
                 timediff = Math.abs((int)MINUTES.between(time, start)); 
                 System.err.println("Time diff is: " + timediff);
@@ -124,11 +123,11 @@ public class Punch {
                 if (time.isBefore(start)) { 
                     if (timediff <= gracePeriod || timediff <= roundInt) { 
                         adjustedtime = start;
-                        adjustmenttype = "(Shift Start)";
+                        adjustmenttype = "Shift Start";
                     }
                     else { //Round interval
                         adjustedtime = roundInterval(roundInt,time);
-                        adjustmenttype = "(Interval Round)";
+                        adjustmenttype = "Interval Round";
                     }
                 }
 
@@ -138,27 +137,27 @@ public class Punch {
                     }
                     else if (timediff <= gracePeriod) { //Grace Period
                         adjustedtime = start;
-                        adjustmenttype = "(Shift Start)";
+                        adjustmenttype = "Shift Start";
                     }
                     else if (timediff >= gracePeriod && timediff <= dockPenalty) { 
                         adjustedtime = start.plusMinutes(dockPenalty);
-                        adjustmenttype = "(Shift Dock)";
+                        adjustmenttype = "Shift Dock";
                     }
                     else if (timediff >= dockPenalty) {
                         adjustedtime = roundInterval(roundInt,time);
-                        adjustmenttype = "(Interval Round)";
+                        adjustmenttype = "Interval Round";
                     }
                 }
 
                 if (time.isAfter(lunchStart) && time.isBefore(lunchStop)) {
                     adjustedtime = lunchStop;
-                    adjustmenttype = "(Lunch Stop)";
+                    adjustmenttype = "Lunch Stop";
                 }
             }
 
 
 
-            if (getEventTypeId() == 0) { 
+            if (punchtypeid == PunchType.CLOCK_OUT) { 
 
                 timediff = Math.abs((int)MINUTES.between(time, stop)); //Mintues between clock out and end of shift
                 System.err.println("Time diff is: " + timediff);
@@ -169,39 +168,37 @@ public class Punch {
                     }
                     else if (timediff <= gracePeriod || timediff <= roundInt) { //Grace Period
                         adjustedtime = stop;
-                        adjustmenttype = "(Shift Stop)";
+                        adjustmenttype = "Shift Stop";
                     }
                     else /*if (timediff > roundinterval)*/ { //Round interval
                         adjustedtime = roundInterval(roundInt,time);
-                        adjustmenttype = "(Interval Round)";
+                        adjustmenttype = "Interval Round";
                     }
                 }
 
                 else if (time.isAfter(lunchStop) && time.isBefore(stop)) {
                     if (timediff <= gracePeriod) { 
                         adjustedtime = stop;
-                        adjustmenttype = "(Shift Stop)";
+                        adjustmenttype = "Shift Stop";
                     }
                     if (timediff >= gracePeriod && timediff <= dockPenalty) { //Dock Penalty
                         adjustedtime = stop.minusMinutes(dockPenalty);
-                        adjustmenttype = "(Shift Dock)";
+                        adjustmenttype = "Shift Dock";
                     }
                     else if (timediff >= dockPenalty) {
                         adjustedtime = roundInterval(roundInt,time);
-                        adjustmenttype = "(Interval Round)";
+                        adjustmenttype = "Interval Round";
                     }
                 }
 
                 else if (time.isAfter(lunchStart) && time.isBefore(lunchStop)) {
                     adjustedtime = lunchStart;
-                    adjustmenttype = "(Lunch Start)";
+                    adjustmenttype = "Lunch Start";
                 }
             }
         }
         
         adjustedtimestamp = LocalDateTime.of(timestamp.toLocalDate(), adjustedtime);
-
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
     }
         
         
@@ -212,7 +209,7 @@ public class Punch {
         StringBuilder result = new StringBuilder();
         
         result.append("#").append(badge.getId()).append(" ").append(punchtypeid).append(": ")
-            .append(dtf.format(adjustedtimestamp).toUpperCase()).append(" ").append(adjustmenttype);
+            .append(dtf.format(adjustedtimestamp).toUpperCase()).append(" (").append(adjustmenttype).append(")");
         
         return result.toString();
     }
