@@ -30,6 +30,9 @@ class Shift {
         this.lunchDuration = MINUTES.between(startLunch, stopLunch);
         this.shiftDuration = MINUTES.between(start, stop);
         
+        this.shiftDuration = java.time.Duration.between(start,stop).toMinutes();
+        this.lunchDuration = java.time.Duration.between(startLunch,stopLunch).toMinutes();        
+        
     }
     
 
@@ -39,6 +42,10 @@ class Shift {
 
     public String getDescription() {
         return description;
+    }
+    
+    public int getRoundInterval(){
+        return roundInterval;
     }
 
     public int getTimeDock() {
