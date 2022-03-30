@@ -37,6 +37,7 @@ public class Punch {
         this.punchtypeid = PunchType.values()[eventtypeid];
         this.id = 0;
         this.adjustmenttype = null;
+        this.adjustedtimestamp = null;
         this.badge = empbadge;
         this.timestamp = LocalDateTime.now().withNano(0);
     }
@@ -60,6 +61,10 @@ public class Punch {
 
     public String getAdjustmenttype() {
         return adjustmenttype;
+    }
+    
+    public LocalDateTime getAdjustedTimestamp(){
+        return adjustedtimestamp;
     }
 
     public LocalDateTime getOriginalTimestamp() {
