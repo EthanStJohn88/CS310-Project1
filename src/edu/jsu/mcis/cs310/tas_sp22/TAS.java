@@ -13,8 +13,36 @@ public class TAS {
      public static final int CLOCKOUT = 0;
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
-        return 0;
-    }
+        int totalMinutes = 0;
+        int lunchLength = 0;
+        int lunchDeduction = 30;
+
+        for (Punch punch : dailypunchlist) {
+
+        if (dailypunchlist.size() == 4) {
+        LocalDateTime start = dailypunchlist.get(0).getAdjustedTimestamp();
+        LocalDateTime stop = dailypunchlist.get(1).getAdjustedTimestamp();
+        LocalDateTime lunchStart = dailypunchlist.get(2).getAdjustedTimestamp();
+        LocalDateTime lunchStop = dailypunchlist.get(3).getAdjustedTimestamp();
+        lunchLength = Math.abs((int)MINUTES.between(lunchStop, stop));
+
+        }
+
+        else if (dailypunchlist.size() == 2) {
+        LocalDateTime start = dailypunchlist.get(0).getAdjustedTimestamp();
+        LocalDateTime stop = dailypunchlist.get(1).getAdjustedTimestamp();
+
+        totalMinutes = Math.abs((int)MINUTES.between(start, stop));
+
+            if (totalMinutes > 480) {
+            totalMinutes = totalMinutes - lunchDeduction;
+            }
+        }
+
+        }
+
+        return totalMinutes;
+}
     
     
     public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){
