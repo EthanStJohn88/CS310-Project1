@@ -1,11 +1,11 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
-import java.time.DayOfWeek;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.json.simple.JSONValue;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class TAS {
     
@@ -13,7 +13,38 @@ public class TAS {
      public static final int CLOCKOUT = 0;
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
-        return 0;
+        int totalMinutes = 0;
+        boolean lunchout = false;
+        boolean lunchpair = false;
+
+        for (int i = 0; i < dailypunchlist.size(); i++){
+            Punch p1 = dailypunchlist.get(i);
+            if(p1.getPunchtype() == PunchType.CLOCK_IN){
+                for(int j = i; j < dailypunchlist.size(); j++){
+                    Punch p2 = dailypunchlist.get(j);
+                    if(p2.getPunchtype() == PunchType.TIME_OUT){
+                        i = j;
+                        j = dailypunchlist.size();
+                    }
+                    else if(p2.getPunchtype() == PunchType.CLOCK_OUT){
+                        if(p2.getAdjustedTimestamp().toLocalTime() == shift.getStartLunch()){
+                            lunchout = true;
+                        }
+                        totalMinutes += MINUTES.between(p1.getAdjustedTimestamp(), p2.getAdjustedTimestamp());
+                        i = j;
+                        j = dailypunchlist.size();
+                    }
+                }
+            }
+            if(lunchout && p1.getAdjustedTimestamp().toLocalTime() == shift.getStopLunch()){
+                lunchpair = true;
+            }
+            if(totalMinutes > shift.getLunchTimeDock() && !lunchpair){
+                totalMinutes -= shift.getLunchduration();
+            }
+        }
+
+        return totalMinutes;
     }
     
     
