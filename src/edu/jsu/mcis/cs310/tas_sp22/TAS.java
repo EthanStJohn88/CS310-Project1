@@ -9,8 +9,11 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class TAS {
     
-     public static final int CLOCKIN = 1;
-     public static final int CLOCKOUT = 0;
+    public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s){
+        double percent = 0;
+        
+        return percent;
+    }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
         int totalMinutes = 0;

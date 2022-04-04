@@ -382,4 +382,22 @@ class TASDatabase {
         
         return Punchlist;
     }
+    
+    public ArrayList<Punch> getPayPeriodPunchList(Badge badge, LocalDate date, Shift shift){
+        ArrayList<Punch> Punchlist = new ArrayList<Punch>();
+        
+        return Punchlist;
+    }
+    
+    public Absenteeism getAbsenteeism(Badge badge, LocalDate date){
+        Absenteeism output = null;
+        
+        return output;
+    }
+    
+    public int insertAbsenteeism(Absenteeism absence){
+        int newID = 0;
+        
+        return newID;
+    }
 }
