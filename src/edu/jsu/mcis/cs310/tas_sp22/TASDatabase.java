@@ -2,9 +2,9 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
 import java.sql.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
@@ -360,7 +360,7 @@ class TASDatabase {
                 
             }
             
-            query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? AND eventtype !=  HAVING tsdate = ? ORDER BY timestamp;";
+            query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? AND eventtype != ? HAVING tsdate = ? ORDER BY timestamp;";
             pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             pstSelect.setInt(2, 1);
@@ -385,18 +385,125 @@ class TASDatabase {
     
     public ArrayList<Punch> getPayPeriodPunchList(Badge badge, LocalDate date, Shift shift){
         ArrayList<Punch> Punchlist = new ArrayList<Punch>();
+        LocalDate start = date;
+        LocalDate end = date;
+        if(date.getDayOfWeek() != DayOfWeek.SUNDAY){ //find start of payperiod
+            while(start.getDayOfWeek() != DayOfWeek.SUNDAY){
+                start = start.minusDays(1);
+            }
+        }
+        if(date.getDayOfWeek() != DayOfWeek.SATURDAY){ //find end of payperiod
+            while(end.getDayOfWeek() != DayOfWeek.SATURDAY){
+                end = end.plusDays(1);
+            }
+        }
+        
+        try{
+            query = "SELECT * FROM event WHERE badgeid = ? AND DATE(timestamp) BETWEEN CAST(? AS DATE) AND CAST(? AS DATE) ORDER BY timestamp;";
+            pstSelect = conn.prepareStatement(query);
+            pstSelect.setString(1, badge.getId());
+            pstSelect.setDate(2, Date.valueOf(start));
+            pstSelect.setDate(3, Date.valueOf(end));
+            
+            hasresults = pstSelect.execute();
+            
+            if(hasresults){
+                ResultSet resultset = pstSelect.getResultSet();
+                while(resultset.next()){
+                    int id = resultset.getInt("id");
+                    Punch p = getPunch(id);
+                    p.adjust(shift);
+                    Punchlist.add(p);
+                }
+            }
+        }
+        catch(SQLException e){ System.out.println("Error in getPayPeriodPunchList() " + e);
+        }
         
         return Punchlist;
     }
     
     public Absenteeism getAbsenteeism(Badge badge, LocalDate date){
         Absenteeism output = null;
+        if(date.getDayOfWeek() != DayOfWeek.SUNDAY){
+            while(date.getDayOfWeek() != DayOfWeek.SUNDAY){
+                date = date.minusDays(1);
+            }
+        }
+        
+        try{
+            query = "SELECT * FROM absenteeism WHERE badgeid = ? AND payperiod = ?;";
+            pstSelect = conn.prepareStatement(query);
+            pstSelect.setString(1, badge.getId());
+            pstSelect.setString(2, String.valueOf(date));
+            
+            hasresults = pstSelect.execute();
+            
+            if(hasresults){
+                ResultSet resultset = pstSelect.getResultSet();
+                
+                resultset.next();
+                
+                HashMap<String, String> params = new HashMap<>();
+                params.put("percentage", resultset.getString("percentage"));
+                params.put("payperiod", String.valueOf(date));
+                
+                output = new Absenteeism(params, badge);
+            }
+        }
+        catch(SQLException e){ System.out.println("Error in getAbsenteeism() " + e);
+        }
         
         return output;
     }
     
     public int insertAbsenteeism(Absenteeism absence){
         int newID = 0;
+        ResultSet keys;
+        
+        if(getAbsenteeism(absence.getBadge(), absence.getPayperiod()) == null){ //add new record
+            try{
+                query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?);";
+                pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+                pstSelect.setString(1, absence.getBadge().getId());
+                pstSelect.setDate(2, Date.valueOf(absence.getPayperiod()));
+                pstSelect.setDouble(3, absence.getPercentage());
+                
+                int result = pstSelect.executeUpdate();
+                
+                if (result == 1) {
+                    keys = pstSelect.getGeneratedKeys();
+                    if (keys.next()) {
+                       newID = keys.getInt(1);
+                    }
+                }
+                
+            }
+            catch(SQLException e){ 
+                System.out.println("Error in insertAbsenteeism() " + e);
+            }
+        }
+        else{ //replace existing record
+            try{
+                query = "REPLACE INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?);";
+                pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+                pstSelect.setString(1, absence.getBadge().getId());
+                pstSelect.setDate(2, Date.valueOf(absence.getPayperiod()));
+                pstSelect.setDouble(3, absence.getPercentage());
+                
+                int result = pstSelect.executeUpdate();
+                
+                if (result == 1) {
+                    keys = pstSelect.getGeneratedKeys();
+                    if (keys.next()) {
+                       newID = keys.getInt(1);
+                    }
+                }
+            }
+            catch(SQLException e){ 
+                System.out.println("Error in insertAbsenteeism() " + e);
+            }
+        }
         
         return newID;
     }

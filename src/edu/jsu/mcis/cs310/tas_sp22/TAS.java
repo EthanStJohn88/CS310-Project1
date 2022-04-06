@@ -12,6 +12,11 @@ public class TAS {
     public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s){
         double percent = 0;
         
+        int totalmin = calculateTotalMinutes(punchlist, s);
+        long shiftDuration = (s.getShiftduration() - s.getLunchduration()) * Shift.WORKDAYS;
+        
+        percent = Double.valueOf((shiftDuration - totalmin)/shiftDuration);
+        
         return percent;
     }
     
@@ -44,6 +49,8 @@ public class TAS {
             }
             if(totalMinutes > shift.getLunchTimeDock() && !lunchpair){
                 totalMinutes -= shift.getLunchduration();
+                lunchpair = false;
+                lunchout = false;
             }
         }
 
@@ -82,6 +89,8 @@ public class TAS {
         final String username = "tasuser";
         final String password = "Team_A";
         
+        TASDatabase db = new TASDatabase();
+        
         //Badge Test
         HashMap<String, String> badge = new HashMap<>();
         badge.put("description", "Chapman, Joshua E");
@@ -92,6 +101,24 @@ public class TAS {
         System.err.println(b1.getId());
         System.err.println(b1.getDescription());
         System.err.println(b1.toString());
+        
+        /* Test getPayPeriodPunchList */
+        
+        Punch p = db.getPunch(1087);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        LocalDateTime ts = p.getOriginalTimestamp();
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
+        
+        int totalmin = calculateTotalMinutes(punchlist, s);
+        long shiftDuration = (s.getShiftduration() - s.getLunchduration()) * Shift.WORKDAYS;
+        double percent = Double.valueOf((shiftDuration - totalmin)/shiftDuration)*100;
+        
+        System.err.println(totalmin);
+        System.err.println(shiftDuration);
+        System.err.println(percent);
+        
     }
     
 }
