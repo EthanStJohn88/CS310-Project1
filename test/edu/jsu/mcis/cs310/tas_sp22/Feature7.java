@@ -115,4 +115,72 @@ public class Feature7 {
         
     }
     
+    /* Student Tests */
+   
+    //Student Test 1
+    @Test
+    public void studentTest1() {
+        
+        //Get Punch
+        
+        Punch p = db.getPunch(1420);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        //Get Pay Period Punch List
+        
+        LocalDateTime ts = p.getOriginalTimestamp();
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
+        
+        //Compute Pay Period Total Absenteeism
+        
+        double percentage = TAS.calculateAbsenteeism(punchlist, s);
+        
+        //Insert Absenteeism Into Database
+        
+        Absenteeism a1 = new Absenteeism(b, ts.toLocalDate(), percentage);
+        db.insertAbsenteeism(a1);
+        
+        //Retrieve Absenteeism From Database
+        
+        Absenteeism a2 = db.getAbsenteeism(b, ts.toLocalDate());
+        
+        //Compare To Expected Value 
+        
+        assertEquals("#2A7F5D99 (Pay Period Starting 08-12-2018): -12.50%", a2.toString());
+    }
+    
+    //Student Test 2
+    @Test
+    public void studentTest2() {
+        
+        //Get Punch
+        
+        Punch p = db.getPunch(288);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        //Get Pay Period Punch List
+        
+        LocalDateTime ts = p.getOriginalTimestamp();
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
+        
+        //Compute Pay Period Total Absenteeism
+        
+        double percentage = TAS.calculateAbsenteeism(punchlist, s);
+        
+        //Insert Absenteeism Into Database
+        
+        Absenteeism a1 = new Absenteeism(b, ts.toLocalDate(), percentage);
+        db.insertAbsenteeism(a1);
+        
+        //Retrieve Absenteeism From Database
+        
+        Absenteeism a2 = db.getAbsenteeism(b, ts.toLocalDate());
+        
+        //Compare To Expected Value 
+        
+        assertEquals("#CF697DE6 (Pay Period Starting 07-29-2018): 40.00%", a2.toString());
+    }
+    
 }
