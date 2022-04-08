@@ -1,5 +1,6 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
+import java.security.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -9,15 +10,61 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class TAS {
     
-    public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s){
-        double percent = 0;
+    public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift shift) {
         
-        int totalmin = calculateTotalMinutes(punchlist, s);
-        long shiftDuration = (s.getShiftduration() - s.getLunchduration()) * Shift.WORKDAYS;
+        double totalMin = 0;
+        double totalexpectedworktime = 2400;
+        ArrayList<ArrayList<Punch>> punches = new ArrayList<ArrayList<Punch>>();
+        ArrayList<Punch> tempList1 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList2 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList3 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList4 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList5 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList6 = new ArrayList<Punch>();
         
-        percent = Double.valueOf((shiftDuration - totalmin)/shiftDuration);
+        for(Punch p: punchlist) {       
+            LocalDateTime t1 = p.getOriginalTimestamp();
+            String day = t1.getDayOfWeek().toString();
+            switch(day) {
+                case "MONDAY":
+                    tempList1.add(p);
+                    break;
+                case "TUESDAY":
+                    tempList2.add(p);
+                    break;
+                case "WEDNESDAY":
+                    tempList3.add(p);
+                    break;
+                case "THURSDAY":
+                    tempList4.add(p);
+                    break;
+                case "FRIDAY":
+                    tempList5.add(p);
+                    break;
+                case "SATURDAY":
+                    tempList6.add(p);
+                    break;
+            } 
+        }
         
-        return percent;
+        punches.add(tempList1);
+        punches.add(tempList2);
+        punches.add(tempList3);
+        punches.add(tempList4);
+        punches.add(tempList5);
+        punches.add(tempList6);
+        
+        for(ArrayList<Punch> a: punches)
+            totalMin += calculateTotalMinutes(a, shift);
+        
+        double absenteeism = totalexpectedworktime - totalMin;
+        double percentage = (absenteeism/2400 );
+        return percentage;
+        
+    }
+    
+    public String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
+        return null;
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
