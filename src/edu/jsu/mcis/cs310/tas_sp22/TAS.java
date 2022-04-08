@@ -1,6 +1,5 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
-import java.security.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class TAS {
         
     }
     
-    public String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
+    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
         return null;
     }
     
