@@ -9,10 +9,15 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class TAS {
     
+    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
+        
+        return null;
+    }
+    
     public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift shift) {
         
         double totalMin = 0;
-        double totalexpectedworktime = 2400;
+        double totalexpectedworktime = (shift.getShiftduration() - shift.getLunchduration()) * Shift.WORKDAYS;
         ArrayList<ArrayList<Punch>> punches = new ArrayList<ArrayList<Punch>>();
         ArrayList<Punch> tempList1 = new ArrayList<Punch>();
         ArrayList<Punch> tempList2 = new ArrayList<Punch>();
@@ -57,13 +62,9 @@ public class TAS {
             totalMin += calculateTotalMinutes(a, shift);
         
         double absenteeism = totalexpectedworktime - totalMin;
-        double percentage = (absenteeism/2400 );
+        double percentage = (absenteeism/totalexpectedworktime);
         return percentage;
         
-    }
-    
-    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
-        return null;
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
@@ -95,8 +96,6 @@ public class TAS {
             }
             if(totalMinutes > shift.getLunchTimeDock() && !lunchpair){
                 totalMinutes -= shift.getLunchduration();
-                lunchpair = false;
-                lunchout = false;
             }
         }
 
@@ -106,7 +105,7 @@ public class TAS {
     
     public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){
         
-            final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
 
             
         ArrayList<HashMap<String, String>> jsonData = new ArrayList<>();
@@ -157,12 +156,10 @@ public class TAS {
         LocalDateTime ts = p.getOriginalTimestamp();
         ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
         
-        int totalmin = calculateTotalMinutes(punchlist, s);
-        long shiftDuration = (s.getShiftduration() - s.getLunchduration()) * Shift.WORKDAYS;
-        double percent = Double.valueOf((shiftDuration - totalmin)/shiftDuration)*100;
+        System.err.println(punchlist);
         
-        System.err.println(totalmin);
-        System.err.println(shiftDuration);
+        double percent = calculateAbsenteeism(punchlist, s);
+
         System.err.println(percent);
         
     }
