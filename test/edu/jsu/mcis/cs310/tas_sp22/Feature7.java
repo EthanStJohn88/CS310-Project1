@@ -114,5 +114,69 @@ public class Feature7 {
         assertEquals("#08D01475 (Pay Period Starting 09-16-2018): -27.50%", a2.toString());
         
     }
+    @Test
+    public void testAbsenteeismShift3Weekend() {
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(936);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        /* Get Pay Period Punch List */
+        
+        LocalDateTime ts = p.getOriginalTimestamp();
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
+        
+        /* Compute Pay Period Total Absenteeism */
+        
+        double percentage = TAS.calculateAbsenteeism(punchlist, s);
+        
+        /* Insert Absenteeism Into Database */
+        
+        Absenteeism a1 = new Absenteeism(b, ts.toLocalDate(), percentage);
+        db.insertAbsenteeism(a1);
+        
+        /* Retrieve Absenteeism From Database */
+        
+        Absenteeism a2 = db.getAbsenteeism(b, ts.toLocalDate());
+        
+        /* Compare to Expected Value */
+        
+        assertEquals("#8C0644BA (Pay Period Starting 08-05-2018): -7.50%", a2.toString());
+
+    }
     
+    @Test
+    public void testAbsenteeismShift3Weekday() {
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(2525);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        /* Get Pay Period Punch List */
+        
+        LocalDateTime ts = p.getOriginalTimestamp();
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
+        
+        /* Compute Pay Period Total Absenteeism */
+        
+        double percentage = TAS.calculateAbsenteeism(punchlist, s);
+        
+        /* Insert Absenteeism Into Database */
+        
+        Absenteeism a1 = new Absenteeism(b, ts.toLocalDate(), percentage);
+        db.insertAbsenteeism(a1);
+        
+        /* Retrieve Absenteeism From Database */
+        
+        Absenteeism a2 = db.getAbsenteeism(b, ts.toLocalDate());
+        
+        /* Compare to Expected Value */
+        
+        assertEquals("#F1EE0555 (Pay Period Starting 08-19-2018): -30.63%", a2.toString());
+        
+    }
 }
