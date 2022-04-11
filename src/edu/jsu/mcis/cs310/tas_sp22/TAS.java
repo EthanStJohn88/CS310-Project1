@@ -1,53 +1,111 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
-import java.time.DayOfWeek;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.json.simple.JSONValue;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class TAS {
     
-     public static final int CLOCKIN = 1;
-     public static final int CLOCKOUT = 0;
+    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
+        
+        return null;
+    }
+    
+    public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift shift) {
+        
+        double totalMin = 0;
+        double totalexpectedworktime = (shift.getShiftduration() - shift.getLunchduration()) * Shift.WORKDAYS;
+        ArrayList<ArrayList<Punch>> punches = new ArrayList<ArrayList<Punch>>();
+        ArrayList<Punch> tempList1 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList2 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList3 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList4 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList5 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList6 = new ArrayList<Punch>();
+        
+        for(Punch p: punchlist) {       
+            LocalDateTime t1 = p.getOriginalTimestamp();
+            String day = t1.getDayOfWeek().toString();
+            switch(day) {
+                case "MONDAY":
+                    tempList1.add(p);
+                    break;
+                case "TUESDAY":
+                    tempList2.add(p);
+                    break;
+                case "WEDNESDAY":
+                    tempList3.add(p);
+                    break;
+                case "THURSDAY":
+                    tempList4.add(p);
+                    break;
+                case "FRIDAY":
+                    tempList5.add(p);
+                    break;
+                case "SATURDAY":
+                    tempList6.add(p);
+                    break;
+            } 
+        }
+        
+        punches.add(tempList1);
+        punches.add(tempList2);
+        punches.add(tempList3);
+        punches.add(tempList4);
+        punches.add(tempList5);
+        punches.add(tempList6);
+        
+        for(ArrayList<Punch> a: punches)
+            totalMin += calculateTotalMinutes(a, shift);
+        
+        double absenteeism = totalexpectedworktime - totalMin;
+        double percentage = (absenteeism/totalexpectedworktime);
+        return percentage;
+        
+    }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
         int totalMinutes = 0;
-        int lunchLength = 0;
-        int lunchDeduction = 30;
+        boolean lunchout = false;
+        boolean lunchpair = false;
 
-        for (Punch punch : dailypunchlist) {
-
-        if (dailypunchlist.size() == 4) {
-        LocalDateTime start = dailypunchlist.get(0).getAdjustedTimestamp();
-        LocalDateTime stop = dailypunchlist.get(1).getAdjustedTimestamp();
-        LocalDateTime lunchStart = dailypunchlist.get(2).getAdjustedTimestamp();
-        LocalDateTime lunchStop = dailypunchlist.get(3).getAdjustedTimestamp();
-        lunchLength = Math.abs((int)MINUTES.between(lunchStop, stop));
-
-        }
-
-        else if (dailypunchlist.size() == 2) {
-        LocalDateTime start = dailypunchlist.get(0).getAdjustedTimestamp();
-        LocalDateTime stop = dailypunchlist.get(1).getAdjustedTimestamp();
-
-        totalMinutes = Math.abs((int)MINUTES.between(start, stop));
-
-            if (totalMinutes > 480) {
-            totalMinutes = totalMinutes - lunchDeduction;
+        for (int i = 0; i < dailypunchlist.size(); i++){
+            Punch p1 = dailypunchlist.get(i);
+            if(p1.getPunchtype() == PunchType.CLOCK_IN){
+                for(int j = i; j < dailypunchlist.size(); j++){
+                    Punch p2 = dailypunchlist.get(j);
+                    if(p2.getPunchtype() == PunchType.TIME_OUT){
+                        i = j;
+                        j = dailypunchlist.size();
+                    }
+                    else if(p2.getPunchtype() == PunchType.CLOCK_OUT){
+                        if(p2.getAdjustedTimestamp().toLocalTime() == shift.getStartLunch()){
+                            lunchout = true;
+                        }
+                        totalMinutes += MINUTES.between(p1.getAdjustedTimestamp(), p2.getAdjustedTimestamp());
+                        i = j;
+                        j = dailypunchlist.size();
+                    }
+                }
+            }
+            if(lunchout && p1.getAdjustedTimestamp().toLocalTime() == shift.getStopLunch()){
+                lunchpair = true;
+            }
+            if(totalMinutes > shift.getLunchTimeDock() && !lunchpair){
+                totalMinutes -= shift.getLunchduration();
             }
         }
 
-        }
-
         return totalMinutes;
-}
+    }
     
     
     public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){
         
-            final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
 
             
         ArrayList<HashMap<String, String>> jsonData = new ArrayList<>();
@@ -76,6 +134,8 @@ public class TAS {
         final String username = "tasuser";
         final String password = "Team_A";
         
+        TASDatabase db = new TASDatabase();
+        
         //Badge Test
         HashMap<String, String> badge = new HashMap<>();
         badge.put("description", "Chapman, Joshua E");
@@ -86,6 +146,22 @@ public class TAS {
         System.err.println(b1.getId());
         System.err.println(b1.getDescription());
         System.err.println(b1.toString());
+        
+        /* Test getPayPeriodPunchList */
+        
+        Punch p = db.getPunch(1087);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        LocalDateTime ts = p.getOriginalTimestamp();
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
+        
+        System.err.println(punchlist);
+        
+        double percent = calculateAbsenteeism(punchlist, s);
+
+        System.err.println(percent);
+        
     }
     
 }

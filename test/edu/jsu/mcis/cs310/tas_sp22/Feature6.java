@@ -127,4 +127,118 @@ public class Feature6 {
         
     }
     
+    
+    /* Student Tests */
+    
+    @Test
+    public void StudentTest1() {
+        
+        /* Expected JSON Data */
+        
+        String expectedJSON = "[{\"originaltimestamp\":\"WED 08\\/15\\/2018 06:47:48\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"WED 08\\/15\\/2018 07:00:00\",\"adjustmenttype\":\"Shift Start\",\"terminalid\":\"104\",\"id\":\"1420\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"WED 08\\/15\\/2018 15:32:02\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"WED 08\\/15\\/2018 15:30:00\",\"adjustmenttype\":\"Shift Stop\",\"terminalid\":\"104\",\"id\":\"1495\",\"punchtype\":\"CLOCK OUT\"}]";
+        
+        ArrayList<HashMap<String, String>> expected = (ArrayList)JSONValue.parse(expectedJSON);
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(1420);
+        Badge b = db.getBadge(p.getBadge().getId());
+        Shift s = db.getShift(b);
+        
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        /* Adjust Punches */
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s);
+        }
+        
+        /* JSON Conversion */
+        
+        String actualJSON = TAS.getPunchListAsJSON(dailypunchlist);
+        
+        ArrayList<HashMap<String, String>> actual = (ArrayList)JSONValue.parse(actualJSON);
+		
+        /* Compare to Expected JSON */
+        
+        assertEquals(expected, actual);
+        
+    }
+    
+    @Test
+    public void StudentTest2() {
+        
+        /* Expected JSON Data */
+        
+        String expectedJSON = "[{\"originaltimestamp\":\"MON 09\\/10\\/2018 10:56:25\",\"badgeid\":\"2986FF85\",\"adjustedtimestamp\":\"MON 09\\/10\\/2018 11:00:00\",\"adjustmenttype\":\"Interval Round\",\"terminalid\":\"104\",\"id\":\"3874\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"MON 09\\/10\\/2018 16:33:46\",\"badgeid\":\"2986FF85\",\"adjustedtimestamp\":\"MON 09\\/10\\/2018 16:30:00\",\"adjustmenttype\":\"Interval Round\",\"terminalid\":\"104\",\"id\":\"3966\",\"punchtype\":\"CLOCK OUT\"}]";
+        
+        ArrayList<HashMap<String, String>> expected = (ArrayList)JSONValue.parse(expectedJSON);
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(3874);
+        Badge b = db.getBadge(p.getBadge().getId());
+        Shift s = db.getShift(b);
+        
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        /* Adjust Punches */
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s);
+        }
+        
+        /* JSON Conversion */
+        
+        String actualJSON = TAS.getPunchListAsJSON(dailypunchlist);
+        
+        ArrayList<HashMap<String, String>> actual = (ArrayList)JSONValue.parse(actualJSON);
+		
+        /* Compare to Expected JSON */
+        
+        assertEquals(expected, actual);
+        
+    }
+    
+    @Test
+    public void StudentTest3() {
+        
+        /* Expected JSON Data */
+        
+        String expectedJSON = "[{\"originaltimestamp\":\"THU 08\\/02\\/2018 06:57:38\",\"badgeid\":\"CF697DE6\",\"adjustedtimestamp\":\"THU 08\\/02\\/2018 07:00:00\",\"adjustmenttype\":\"Shift Start\",\"terminalid\":\"104\",\"id\":\"288\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"THU 08\\/02\\/2018 15:32:45\",\"badgeid\":\"CF697DE6\",\"adjustedtimestamp\":\"THU 08\\/02\\/2018 15:30:00\",\"adjustmenttype\":\"Shift Stop\",\"terminalid\":\"104\",\"id\":\"346\",\"punchtype\":\"CLOCK OUT\"}]";
+        
+        ArrayList<HashMap<String, String>> expected = (ArrayList)JSONValue.parse(expectedJSON);
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(288);
+        Badge b = db.getBadge(p.getBadge().getId());
+        Shift s = db.getShift(b);
+        
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        /* Adjust Punches */
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s);
+        }
+        
+        /* JSON Conversion */
+        
+        String actualJSON = TAS.getPunchListAsJSON(dailypunchlist);
+        
+        ArrayList<HashMap<String, String>> actual = (ArrayList)JSONValue.parse(actualJSON);
+		
+        /* Compare to Expected JSON */
+        
+        assertEquals(expected, actual);
+        
+    }
+    
 }

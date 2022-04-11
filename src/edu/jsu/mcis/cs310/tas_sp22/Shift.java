@@ -12,6 +12,7 @@ class Shift {
     private String description;
     private LocalTime start, stop, startLunch, stopLunch;
     private long lunchDuration, shiftDuration;
+    public static final int WORKDAYS = 5;
    
     
     public Shift (HashMap<String, String> shiftParams)
