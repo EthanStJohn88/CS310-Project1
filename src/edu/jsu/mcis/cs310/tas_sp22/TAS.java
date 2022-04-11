@@ -6,12 +6,66 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import org.json.simple.JSONValue;
 import static java.time.temporal.ChronoUnit.MINUTES;
+import org.json.simple.JSONObject;
 
 public class TAS {
     
     public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
         
-        return null;
+        JSONObject jsonData = new JSONObject();
+        
+        String percent = String.format("%.2f", calculateAbsenteeism(punchlist, s)*100) + "%";
+        
+        int totalMin = 0;
+        
+        ArrayList<ArrayList<Punch>> punches = new ArrayList<ArrayList<Punch>>();
+        ArrayList<Punch> tempList1 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList2 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList3 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList4 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList5 = new ArrayList<Punch>();
+        ArrayList<Punch> tempList6 = new ArrayList<Punch>();
+        
+        for(Punch p: punchlist) {       
+            LocalDateTime t1 = p.getOriginalTimestamp();
+            String day = t1.getDayOfWeek().toString();
+            switch(day) {
+                case "MONDAY":
+                    tempList1.add(p);
+                    break;
+                case "TUESDAY":
+                    tempList2.add(p);
+                    break;
+                case "WEDNESDAY":
+                    tempList3.add(p);
+                    break;
+                case "THURSDAY":
+                    tempList4.add(p);
+                    break;
+                case "FRIDAY":
+                    tempList5.add(p);
+                    break;
+                case "SATURDAY":
+                    tempList6.add(p);
+                    break;
+            } 
+        }
+        
+        punches.add(tempList1);
+        punches.add(tempList2);
+        punches.add(tempList3);
+        punches.add(tempList4);
+        punches.add(tempList5);
+        punches.add(tempList6);
+        
+        for(ArrayList<Punch> a: punches)
+            totalMin += calculateTotalMinutes(a, s);
+        
+        jsonData.put("absenteeism", percent);
+        jsonData.put("totalminutes", String.valueOf(totalMin));
+        jsonData.put("punchlist", JSONValue.parse(getPunchListAsJSON(punchlist)));
+        
+        return JSONValue.toJSONString(jsonData);
     }
     
     public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift shift) {

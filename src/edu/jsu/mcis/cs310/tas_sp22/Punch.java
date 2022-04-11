@@ -1,14 +1,10 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
+import java.time.DayOfWeek;
 import java.util.HashMap;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;  
-import java.time.format.TextStyle;
-import java.util.Locale;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class Punch {
@@ -112,9 +108,9 @@ public class Punch {
         adjustmenttype = "None";
         int timediff = 0;
         
-        if (timestamp.get(ChronoField.DAY_OF_WEEK) == 6 || timestamp.get(ChronoField.DAY_OF_WEEK) == 7) {
-        adjustedtime = roundInterval(roundInt,time);
-        adjustmenttype = "Interval Round";
+        if (timestamp.getDayOfWeek() == DayOfWeek.SATURDAY || timestamp.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            adjustedtime = roundInterval(roundInt,time);
+            adjustmenttype = "Interval Round";
             
         }
         
@@ -130,7 +126,7 @@ public class Punch {
                         adjustedtime = start;
                         adjustmenttype = "Shift Start";
                     }
-                    else { //Round interval
+                    else if(timediff > s.getRoundInterval()) { //Round interval
                         adjustedtime = roundInterval(roundInt,time);
                         adjustmenttype = "Interval Round";
                     }
@@ -175,7 +171,7 @@ public class Punch {
                         adjustedtime = stop;
                         adjustmenttype = "Shift Stop";
                     }
-                    else /*if (timediff > roundinterval)*/ { //Round interval
+                    else if(timediff > s.getRoundInterval()){ //Round interval
                         adjustedtime = roundInterval(roundInt,time);
                         adjustmenttype = "Interval Round";
                     }
