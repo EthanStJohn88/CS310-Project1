@@ -115,4 +115,57 @@ public class Feature5 {
         
     }
     
+    /* Student Test */
+    
+    //Student Test 1
+    @Test
+    public void studentTest1() {
+        
+        //Get Punch
+        
+        Punch p = db.getPunch(1420);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s);
+        }
+        
+        //Compute Pay Period Total
+        
+        int m = TAS.calculateTotalMinutes(dailypunchlist, s);
+        
+        //Compare to Expected Value
+        
+        assertEquals(480, m);
+    }
+    
+    //Student Test 2
+    @Test
+    public void studentTest2() {
+        
+        //Get Punch
+        
+        Punch p = db.getPunch(206);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s);
+        }
+        
+        //Compute Pay Period Total
+        
+        int m = TAS.calculateTotalMinutes(dailypunchlist, s);
+        
+        //Compare to Expected Value
+        
+        assertEquals(300, m);
+        
+    }
+    
 }
