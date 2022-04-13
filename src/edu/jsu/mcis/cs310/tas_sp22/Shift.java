@@ -1,7 +1,6 @@
 
 package edu.jsu.mcis.cs310.tas_sp22;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -26,7 +25,7 @@ class Shift {
         this.gracePeriod = Integer.parseInt(shiftParams.get("gracePeriod"));
         this.timeDock = Integer.parseInt(shiftParams.get("timeDock")); 
         this.startLunch = LocalTime.parse(shiftParams.get("startLunch"));
-        this.stopLunch = LocalTime.parse(shiftParams.get("stopLunch"));;
+        this.stopLunch = LocalTime.parse(shiftParams.get("stopLunch"));
         this.lunchTimeDock = Integer.parseInt(shiftParams.get("lunchTimeDock"));
         this.lunchDuration = MINUTES.between(startLunch, stopLunch);
         this.shiftDuration = MINUTES.between(start, stop);

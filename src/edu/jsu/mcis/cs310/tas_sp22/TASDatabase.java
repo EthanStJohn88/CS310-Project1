@@ -1,4 +1,3 @@
-
 package edu.jsu.mcis.cs310.tas_sp22;
 
 import java.sql.*;
@@ -11,10 +10,6 @@ import java.util.ArrayList;
 class TASDatabase {
     
     private Connection conn = null;
-    private String query;
-    private PreparedStatement pstSelect = null, pstUpdate = null;    
-    private boolean hasresults;
-    private int updateCount;    
     private DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
 
     public TASDatabase()
@@ -38,7 +33,7 @@ class TASDatabase {
         catch(SQLException e){ System.out.println("SQL Connection failed!" +
                 " Invalid database setup?" + e); 
         }    
-        catch(Exception e){}
+        catch(Exception e){ e.printStackTrace();}
         
     }
     
@@ -47,14 +42,8 @@ class TASDatabase {
         try{
             conn.close();
         }
-        catch(SQLException e){
-        }
-        finally{
-            if(pstSelect != null){
-                
-                pstSelect = null;
-                
-            }
+        catch(Exception e){
+            e.printStackTrace();
         }
     }
         
@@ -63,11 +52,11 @@ class TASDatabase {
         Badge outputBadge = null;
         
         try{
-            query = "SELECT * FROM badge WHERE id = ?;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * FROM badge WHERE id = ?;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, id);
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if (hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -93,11 +82,11 @@ class TASDatabase {
         Shift outputShift = null;
         
         try{
-            query = "SELECT * FROM shift WHERE id = ?;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * FROM shift WHERE id = ?;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setInt(1, id);
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -131,11 +120,11 @@ class TASDatabase {
         Shift outputShift = null;
         
         try{
-            query = "SELECT * FROM employee JOIN shift ON employee.shiftid = shift.id WHERE badgeid = ?;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * FROM employee JOIN shift ON employee.shiftid = shift.id WHERE badgeid = ?;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -167,11 +156,11 @@ class TASDatabase {
         Employee outputEmployee = null;
         
         try{
-            query = "SELECT * FROM employee WHERE id = ?;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * FROM employee WHERE id = ?;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setInt(1, id);
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -188,7 +177,7 @@ class TASDatabase {
                 shift.put("departmentid", resultset.getString("departmentid"));
                 shift.put("shiftid", resultset.getString("shiftid"));
                 shift.put("active", String.valueOf(resultset.getTimestamp("active").toLocalDateTime()));
-                if(resultset.getString("inactive") == "none" || resultset.getTimestamp("inactive") == null){
+                if("none".equals(resultset.getString("inactive")) || resultset.getTimestamp("inactive") == null){
                     shift.put("inactive", resultset.getString("inactive"));
                 }
                 else{
@@ -209,11 +198,11 @@ class TASDatabase {
         Employee outputEmployee = null;
         
         try{
-            query = "SELECT * from employee where badgeid = ?;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * from employee where badgeid = ?;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -230,7 +219,7 @@ class TASDatabase {
                 shift.put("departmentid", resultset.getString("departmentid"));
                 shift.put("shiftid", resultset.getString("shiftid"));
                 shift.put("active", String.valueOf(resultset.getTimestamp("active").toLocalDateTime()));
-                if(resultset.getString("inactive") == "none" || resultset.getTimestamp("inactive") == null){
+                if("none".equals(resultset.getString("inactive")) || resultset.getTimestamp("inactive") == null){
                     shift.put("inactive", resultset.getString("inactive"));
                 }
                 else{
@@ -249,11 +238,11 @@ class TASDatabase {
         Punch outputPunch = null;
         
         try{
-            query = "SELECT * FROM event JOIN badge ON event.badgeid = badge.id WHERE event.id = ?;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * FROM event JOIN badge ON event.badgeid = badge.id WHERE event.id = ?;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setInt(1, id);
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -279,11 +268,11 @@ class TASDatabase {
         Department outputDept = null;
         
         try{
-            query = "SELECT * FROM department WHERE id = ?;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * FROM department WHERE id = ?;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setInt(1, id);
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -313,8 +302,8 @@ class TASDatabase {
         
         if(punch.getTerminalid() == department.getTerminalid() || punch.getTerminalid() == 0){
             try{
-                query = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?, ?, ?, ?);";
-                pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+                String query = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?, ?, ?, ?);";
+                PreparedStatement pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
                 pstSelect.setInt(1, punch.getTerminalid());
                 pstSelect.setString(2, punch.getBadge().getId());
                 pstSelect.setString(3, punch.getOriginalTimestamp().toString());
@@ -339,15 +328,15 @@ class TASDatabase {
     }
     
     public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate date) {
-        ArrayList<Punch> Punchlist = new ArrayList<Punch>();
+        ArrayList<Punch> Punchlist = new ArrayList<>();
         //Query and filling of Arraylist
         try{
-            query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? HAVING tsdate = ? ORDER BY timestamp;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? HAVING tsdate = ? ORDER BY timestamp;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             pstSelect.setString(2, String.valueOf(date));
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -384,7 +373,7 @@ class TASDatabase {
     }
     
     public ArrayList<Punch> getPayPeriodPunchList(Badge badge, LocalDate date, Shift shift){
-        ArrayList<Punch> Punchlist = new ArrayList<Punch>();
+        ArrayList<Punch> Punchlist = new ArrayList<>();
         LocalDate start = date;
         LocalDate end = date;
         if(date.getDayOfWeek() != DayOfWeek.SUNDAY){ //find start of payperiod
@@ -399,13 +388,13 @@ class TASDatabase {
         }
         
         try{
-            query = "SELECT * FROM event WHERE badgeid = ? AND DATE(timestamp) BETWEEN CAST(? AS DATE) AND CAST(? AS DATE) ORDER BY timestamp;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * FROM event WHERE badgeid = ? AND DATE(timestamp) BETWEEN CAST(? AS DATE) AND CAST(? AS DATE) ORDER BY timestamp;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             pstSelect.setDate(2, Date.valueOf(start));
             pstSelect.setDate(3, Date.valueOf(end));
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -432,12 +421,12 @@ class TASDatabase {
         }
         
         try{
-            query = "SELECT * FROM absenteeism WHERE badgeid = ? AND payperiod = ?;";
-            pstSelect = conn.prepareStatement(query);
+            String query = "SELECT * FROM absenteeism WHERE badgeid = ? AND payperiod = ?;";
+            PreparedStatement pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             pstSelect.setString(2, String.valueOf(date));
             
-            hasresults = pstSelect.execute();
+            boolean hasresults = pstSelect.execute();
             
             if(hasresults){
                 ResultSet resultset = pstSelect.getResultSet();
@@ -463,8 +452,8 @@ class TASDatabase {
         
         if(getAbsenteeism(absence.getBadge(), absence.getPayperiod()) == null){ //add new record
             try{
-                query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?);";
-                pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+                String query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?);";
+                PreparedStatement pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
                 pstSelect.setString(1, absence.getBadge().getId());
                 pstSelect.setDate(2, Date.valueOf(absence.getPayperiod()));
                 pstSelect.setDouble(3, absence.getPercentage());
@@ -485,8 +474,8 @@ class TASDatabase {
         }
         else{ //replace existing record
             try{
-                query = "REPLACE INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?);";
-                pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+                String query = "REPLACE INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?);";
+                PreparedStatement pstSelect = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
                 pstSelect.setString(1, absence.getBadge().getId());
                 pstSelect.setDate(2, Date.valueOf(absence.getPayperiod()));
                 pstSelect.setDouble(3, absence.getPercentage());

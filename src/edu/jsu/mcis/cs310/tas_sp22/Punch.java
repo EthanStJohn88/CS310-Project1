@@ -71,6 +71,11 @@ public class Punch {
         return badge;
     }
 
+    @Override
+    public String toString() {
+        return printOriginal();
+    }
+
     public String printOriginal() {
         StringBuilder result = new StringBuilder();
         
@@ -106,7 +111,7 @@ public class Punch {
         
         LocalTime time = getOriginalTimestamp().toLocalTime();
         adjustmenttype = "None";
-        int timediff = 0;
+        float timediff = 0;
         
         if (timestamp.getDayOfWeek() == DayOfWeek.SATURDAY || timestamp.getDayOfWeek() == DayOfWeek.SUNDAY) {
             adjustedtime = roundInterval(roundInt,time);
@@ -118,7 +123,7 @@ public class Punch {
 
             if (punchtypeid == PunchType.CLOCK_IN) { 
 
-                timediff = Math.abs((int)MINUTES.between(time, start)); 
+                timediff = Math.abs(MINUTES.between(time, start)); 
                 System.err.println("Time diff is: " + timediff);
 
                 if (time.isBefore(start)) { 

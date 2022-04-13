@@ -18,13 +18,13 @@ public class TAS {
         
         int totalMin = 0;
         
-        ArrayList<ArrayList<Punch>> punches = new ArrayList<ArrayList<Punch>>();
-        ArrayList<Punch> tempList1 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList2 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList3 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList4 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList5 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList6 = new ArrayList<Punch>();
+        ArrayList<ArrayList<Punch>> punches = new ArrayList<>();
+        ArrayList<Punch> tempList1 = new ArrayList<>();
+        ArrayList<Punch> tempList2 = new ArrayList<>();
+        ArrayList<Punch> tempList3 = new ArrayList<>();
+        ArrayList<Punch> tempList4 = new ArrayList<>();
+        ArrayList<Punch> tempList5 = new ArrayList<>();
+        ArrayList<Punch> tempList6 = new ArrayList<>();
         
         for(Punch p: punchlist) {       
             LocalDateTime t1 = p.getOriginalTimestamp();
@@ -72,13 +72,13 @@ public class TAS {
         
         double totalMin = 0;
         double totalexpectedworktime = (shift.getShiftduration() - shift.getLunchduration()) * Shift.WORKDAYS;
-        ArrayList<ArrayList<Punch>> punches = new ArrayList<ArrayList<Punch>>();
-        ArrayList<Punch> tempList1 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList2 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList3 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList4 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList5 = new ArrayList<Punch>();
-        ArrayList<Punch> tempList6 = new ArrayList<Punch>();
+        ArrayList<ArrayList<Punch>> punches = new ArrayList<>();
+        ArrayList<Punch> tempList1 = new ArrayList<>();
+        ArrayList<Punch> tempList2 = new ArrayList<>();
+        ArrayList<Punch> tempList3 = new ArrayList<>();
+        ArrayList<Punch> tempList4 = new ArrayList<>();
+        ArrayList<Punch> tempList5 = new ArrayList<>();
+        ArrayList<Punch> tempList6 = new ArrayList<>();
         
         for(Punch p: punchlist) {       
             LocalDateTime t1 = p.getOriginalTimestamp();
@@ -195,27 +195,37 @@ public class TAS {
         badge.put("description", "Chapman, Joshua E");
         badge.put("id", "12565C60");
         
-        Badge b1 = new Badge(badge);
+        Badge b = new Badge(badge);
         System.err.println(badge);
-        System.err.println(b1.getId());
-        System.err.println(b1.getDescription());
-        System.err.println(b1.toString());
+        System.err.println(b.getId());
+        System.err.println(b.getDescription());
+        System.err.println(b.toString());
         
         /* Test getPayPeriodPunchList */
         
-        Punch p = db.getPunch(1087);
-        Badge b = p.getBadge();
-        Shift s = db.getShift(b);
+        Punch p1 = db.getPunch(1087);
+        Badge b1 = p1.getBadge();
+        Shift s1 = db.getShift(b1);
         
-        LocalDateTime ts = p.getOriginalTimestamp();
-        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
+        LocalDateTime ts = p1.getOriginalTimestamp();
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b1, ts.toLocalDate(), s1);
         
         System.err.println(punchlist);
         
-        double percent = calculateAbsenteeism(punchlist, s);
+        double percent = calculateAbsenteeism(punchlist, s1);
 
         System.err.println(percent);
         
+        Punch p2 = db.getPunch(4943);
+        Badge b2 = db.getBadge(p2.getBadge().getId());
+        Shift s2 = db.getShift(b2);
+        
+        LocalTime time = p2.getOriginalTimestamp().toLocalTime();
+        LocalTime start = s2.getStart();
+        
+        float timediff = Math.abs(MINUTES.between(time, start));
+        
+        System.err.println(timediff);
     }
     
 }

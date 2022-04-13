@@ -1,4 +1,5 @@
 package edu.jsu.mcis.cs310.tas_sp22;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
@@ -19,7 +20,7 @@ public class Employee
         this.dept = Integer.parseInt(data.get("departmentid"));
         this.shiftid = Integer.parseInt(data.get("shiftid"));
         this.active = LocalDateTime.parse(data.get("active"));
-        if(data.get("inactive") == "none" || data.get("inactive") == null ){
+        if("none".equals(data.get("inactive")) || data.get("inactive") == null ){
             this.inactive = null;
         }
         else{
@@ -69,8 +70,6 @@ public class Employee
         return inactive;
     }
     
-    
-
     @Override
     public String toString() {    
         StringBuilder result = new StringBuilder();
