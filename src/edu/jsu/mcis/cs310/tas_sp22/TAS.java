@@ -216,16 +216,17 @@ public class TAS {
 
         System.err.println(percent);
         
-        Punch p2 = db.getPunch(4943);
+        Punch p2 = db.getPunch(5307);
         Badge b2 = db.getBadge(p2.getBadge().getId());
         Shift s2 = db.getShift(b2);
         
         LocalTime time = p2.getOriginalTimestamp().toLocalTime();
-        LocalTime start = s2.getStart();
+        LocalTime stop = s2.getStop();
         
-        float timediff = Math.abs(MINUTES.between(time, start));
+        float timediff = Math.abs(MINUTES.between(time, stop));
         
-        System.err.println(timediff);
+        System.err.println(time + " " + stop + " " + timediff);
+
     }
     
 }

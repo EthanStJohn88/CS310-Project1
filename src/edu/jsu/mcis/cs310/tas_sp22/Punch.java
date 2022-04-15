@@ -131,9 +131,12 @@ public class Punch {
                         adjustedtime = start;
                         adjustmenttype = "Shift Start";
                     }
-                    else if(timediff > s.getRoundInterval()) { //Round interval
+                    else if(timediff <= roundInt) { //Round interval
                         adjustedtime = roundInterval(roundInt,time);
                         adjustmenttype = "Interval Round";
+                    }
+                    else{
+                        adjustedtime = roundInterval(roundInt,time);
                     }
                 }
 
@@ -165,20 +168,23 @@ public class Punch {
 
             if (punchtypeid == PunchType.CLOCK_OUT) { 
 
-                timediff = Math.abs((int)MINUTES.between(time, stop)); //Mintues between clock out and end of shift
+                timediff = Math.abs(MINUTES.between(time, stop)); //Mintues between clock out and end of shift
                 System.err.println("Time diff is: " + timediff);
 
                 if (time.isAfter(stop)) { //After shift stop
-                    if (timediff < 1 || timediff == 60) { //Are the seconds between 0:00 and 0:59
-                        adjustedtime = time.withSecond(0);
-                    }
-                    else if (timediff <= gracePeriod || timediff <= roundInt) { //Grace Period
+                    if (timediff <= gracePeriod || timediff <= roundInt) { //Grace Period
                         adjustedtime = stop;
                         adjustmenttype = "Shift Stop";
                     }
-                    else if(timediff > s.getRoundInterval()){ //Round interval
+                    else if (timediff < 1) { //Are the seconds between 0:00 and 0:59
+                        adjustedtime = time.withSecond(0);
+                    }
+                    else if(timediff <= roundInt){ //Round interval
                         adjustedtime = roundInterval(roundInt,time);
                         adjustmenttype = "Interval Round";
+                    }
+                    else{
+                        adjustedtime = roundInterval(roundInt,time);
                     }
                 }
 
