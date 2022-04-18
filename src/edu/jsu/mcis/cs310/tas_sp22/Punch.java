@@ -176,15 +176,12 @@ public class Punch {
                         adjustedtime = stop;
                         adjustmenttype = "Shift Stop";
                     }
-                    else if (timediff < 1) { //Are the seconds between 0:00 and 0:59
+                    else if (LocalTime.of(time.getHour(), time.getMinute()).equals(roundInterval(roundInt,time))){
                         adjustedtime = time.withSecond(0);
-                    }
-                    else if(timediff <= roundInt){ //Round interval
-                        adjustedtime = roundInterval(roundInt,time);
-                        adjustmenttype = "Interval Round";
                     }
                     else{
                         adjustedtime = roundInterval(roundInt,time);
+                        adjustmenttype = "Interval Round";
                     }
                 }
 

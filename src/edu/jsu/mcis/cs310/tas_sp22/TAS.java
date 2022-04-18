@@ -216,7 +216,7 @@ public class TAS {
 
         System.err.println(percent);
         
-        Punch p2 = db.getPunch(5307);
+        Punch p2 = db.getPunch(5004);
         Badge b2 = db.getBadge(p2.getBadge().getId());
         Shift s2 = db.getShift(b2);
         
@@ -226,6 +226,10 @@ public class TAS {
         float timediff = Math.abs(MINUTES.between(time, stop));
         
         System.err.println(time + " " + stop + " " + timediff);
+        
+        int roundInt = s2.getRoundInterval();
+        
+        System.err.println(LocalTime.of(time.getHour(), time.getMinute()) + " " + p2.roundInterval(roundInt,time));
 
     }
     
