@@ -349,7 +349,7 @@ class TASDatabase {
                 
             }
             
-            query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? AND eventtype != ? HAVING tsdate = ? ORDER BY timestamp;";
+            query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? AND eventtypeid != ? HAVING tsdate = ? ORDER BY timestamp;";
             pstSelect = conn.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             pstSelect.setInt(2, 1);

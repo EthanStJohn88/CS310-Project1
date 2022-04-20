@@ -230,6 +230,36 @@ public class TAS {
         int roundInt = s2.getRoundInterval();
         
         System.err.println(LocalTime.of(time.getHour(), time.getMinute()) + " " + p2.roundInterval(roundInt,time));
+        
+        /*Test for Feature 8*/
+        
+        Punch p3 = db.getPunch(555);
+        Badge b3 = db.getBadge(p3.getBadge().getId());
+        Shift s3 = db.getShift(b3);
+                
+        ArrayList<Punch> punchlist2 = db.getPayPeriodPunchList(b3, p3.getOriginalTimestamp().toLocalDate(), s3);
+                
+        String actualJSON = TAS.getPunchListPlusTotalsAsJSON(punchlist2, s3);
+        
+        JSONObject actual = (JSONObject)(JSONValue.parse(actualJSON));
+        
+        System.err.println(actual);
+        
+        /*Tests for Feature 5*/
+        
+        Punch p4 = db.getPunch(333);
+        Badge b4 = p4.getBadge();
+        Shift s4 = db.getShift(b4);
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b4, p4.getOriginalTimestamp().toLocalDate());
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s4);
+        }
+        
+        int m = TAS.calculateTotalMinutes(dailypunchlist, s4);
+        
+        System.err.println(m);
 
     }
     

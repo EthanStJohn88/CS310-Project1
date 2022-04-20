@@ -168,4 +168,29 @@ public class Feature5 {
         
     }
     
+    @Test
+    public void studentTest3() {
+        
+        //Get Punch
+        
+        Punch p = db.getPunch(333);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s);
+        }
+        
+        //Compute Pay Period Total
+        
+        int m = TAS.calculateTotalMinutes(dailypunchlist, s);
+        
+        //Compare to Expected Value
+        
+        assertEquals(480, m);
+        
+    }
+    
 }
