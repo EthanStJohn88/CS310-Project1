@@ -231,7 +231,7 @@ public class TAS {
         
         System.err.println(LocalTime.of(time.getHour(), time.getMinute()) + " " + p2.roundInterval(roundInt,time));
         
-        /*Test for Feature 8*/
+        /*Tests for Feature 8*/
         
         Punch p3 = db.getPunch(555);
         Badge b3 = db.getBadge(p3.getBadge().getId());
@@ -242,6 +242,22 @@ public class TAS {
         String actualJSON = TAS.getPunchListPlusTotalsAsJSON(punchlist2, s3);
         
         JSONObject actual = (JSONObject)(JSONValue.parse(actualJSON));
+        
+        System.err.println(actual);
+        
+        Punch p5 = db.getPunch(870);
+        Badge b5 = db.getBadge(p5.getBadge().getId());
+        Shift s5 = db.getShift(b5);
+		
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> punchlist5 = db.getPayPeriodPunchList(b5, p5.getOriginalTimestamp().toLocalDate(), s5);
+        
+        /* JSON Conversion */
+        
+        String actualJSON2 = TAS.getPunchListPlusTotalsAsJSON(punchlist5, s5);
+        
+        JSONObject actual2 = (JSONObject)(JSONValue.parse(actualJSON2));
         
         System.err.println(actual);
         
