@@ -109,6 +109,34 @@ public class Feature8 {
         assertEquals(expected, actual);
         
     }
+           @Test
+    public void StudentTest1() {
+        
+        /* Expected JSON Data */
+        String expectedJSON = "{\"absenteeism\":\"26.88%\",\"totalminutes\":\"1755\",\"punchlist\":[{\"originaltimestamp\":\"WED 08\\/08\\/2018 06:44:00\",\"badgeid\":\"9973DBF1\",\"adjustedtimestamp\":\"WED 08\\/08\\/2018 06:45:00\",\"adjustmenttype\":\"None\",\"id\":\"720\",\"terminalid\":\"105\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"WED 08\\/08\\/2018 16:33:21\",\"badgeid\":\"9973DBF1\",\"adjustedtimestamp\":\"WED 08\\/08\\/2018 16:30:00\",\"adjustmenttype\":\"Interval Round\",\"id\":\"821\",\"terminalid\":\"105\",\"punchtype\":\"CLOCK OUT\"},{\"originaltimestamp\":\"THU 08\\/09\\/2018 06:59:58\",\"badgeid\":\"9973DBF1\",\"adjustedtimestamp\":\"THU 08\\/09\\/2018 07:00:00\",\"adjustmenttype\":\"Shift Start\",\"id\":\"870\",\"terminalid\":\"105\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"THU 08\\/09\\/2018 16:30:48\",\"badgeid\":\"9973DBF1\",\"adjustedtimestamp\":\"THU 08\\/09\\/2018 16:30:00\",\"adjustmenttype\":\"None\",\"id\":\"935\",\"terminalid\":\"105\",\"punchtype\":\"CLOCK OUT\"},{\"originaltimestamp\":\"FRI 08\\/10\\/2018 07:07:18\",\"badgeid\":\"9973DBF1\",\"adjustedtimestamp\":\"FRI 08\\/10\\/2018 07:15:00\",\"adjustmenttype\":\"Shift Dock\",\"id\":\"1010\",\"terminalid\":\"105\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"FRI 08\\/10\\/2018 15:32:44\",\"badgeid\":\"9973DBF1\",\"adjustedtimestamp\":\"FRI 08\\/10\\/2018 15:30:00\",\"adjustmenttype\":\"Shift Stop\",\"id\":\"1051\",\"terminalid\":\"105\",\"punchtype\":\"CLOCK OUT\"},{\"originaltimestamp\":\"SAT 08\\/11\\/2018 06:02:47\",\"badgeid\":\"9973DBF1\",\"adjustedtimestamp\":\"SAT 08\\/11\\/2018 06:00:00\",\"adjustmenttype\":\"Interval Round\",\"id\":\"1118\",\"terminalid\":\"105\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"SAT 08\\/11\\/2018 09:08:42\",\"badgeid\":\"9973DBF1\",\"adjustedtimestamp\":\"SAT 08\\/11\\/2018 09:15:00\",\"adjustmenttype\":\"Interval Round\",\"id\":\"1124\",\"terminalid\":\"105\",\"punchtype\":\"CLOCK OUT\"}]}";
+        JSONObject expected = (JSONObject)(JSONValue.parse(expectedJSON));
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(870);
+        Badge b = db.getBadge(p.getBadge().getId());
+        Shift s = db.getShift(b);
+		
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, p.getOriginalTimestamp().toLocalDate(), s);
+        
+        /* JSON Conversion */
+        
+        String actualJSON = TAS.getPunchListPlusTotalsAsJSON(punchlist, s);
+        
+        JSONObject actual = (JSONObject)(JSONValue.parse(actualJSON));
+		
+        /* Compare to Expected JSON */
+        
+        assertEquals(expected, actual);
+        
+    }
     
     /*Student Test*/
     
