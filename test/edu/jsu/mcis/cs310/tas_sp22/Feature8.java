@@ -202,4 +202,37 @@ public class Feature8 {
         
     }
     
+    //Student Test
+    
+    @Test
+    public void studentTest4 () {
+       
+        /* Expected JSON Data */
+        
+        String expectedJSON = "{\"absenteeism\":\"-12.50%\",\"totalminutes\":\"2700\",\"punchlist\":[{\"originaltimestamp\":\"MON 08\\/13\\/2018 06:58:49\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"MON 08\\/13\\/2018 07:00:00\",\"adjustmenttype\":\"Shift Start\",\"id\":\"1206\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"MON 08\\/13\\/2018 15:32:41\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"MON 08\\/13\\/2018 15:30:00\",\"adjustmenttype\":\"Shift Stop\",\"id\":\"1256\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK OUT\"},{\"originaltimestamp\":\"TUE 08\\/14\\/2018 06:53:58\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"TUE 08\\/14\\/2018 07:00:00\",\"adjustmenttype\":\"Shift Start\",\"id\":\"1305\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"TUE 08\\/14\\/2018 15:32:37\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"TUE 08\\/14\\/2018 15:30:00\",\"adjustmenttype\":\"Shift Stop\",\"id\":\"1379\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK OUT\"},{\"originaltimestamp\":\"WED 08\\/15\\/2018 06:47:48\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"WED 08\\/15\\/2018 07:00:00\",\"adjustmenttype\":\"Shift Start\",\"id\":\"1420\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"WED 08\\/15\\/2018 15:32:02\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"WED 08\\/15\\/2018 15:30:00\",\"adjustmenttype\":\"Shift Stop\",\"id\":\"1495\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK OUT\"},{\"originaltimestamp\":\"THU 08\\/16\\/2018 06:57:18\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"THU 08\\/16\\/2018 07:00:00\",\"adjustmenttype\":\"Shift Start\",\"id\":\"1568\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"THU 08\\/16\\/2018 15:33:06\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"THU 08\\/16\\/2018 15:30:00\",\"adjustmenttype\":\"Shift Stop\",\"id\":\"1638\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK OUT\"},{\"originaltimestamp\":\"FRI 08\\/17\\/2018 06:49:56\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"FRI 08\\/17\\/2018 07:00:00\",\"adjustmenttype\":\"Shift Start\",\"id\":\"1683\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"FRI 08\\/17\\/2018 15:32:24\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"FRI 08\\/17\\/2018 15:30:00\",\"adjustmenttype\":\"Shift Stop\",\"id\":\"1767\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK OUT\"},{\"originaltimestamp\":\"SAT 08\\/18\\/2018 05:53:01\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"SAT 08\\/18\\/2018 06:00:00\",\"adjustmenttype\":\"Interval Round\",\"id\":\"1809\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK IN\"},{\"originaltimestamp\":\"SAT 08\\/18\\/2018 11:02:45\",\"badgeid\":\"2A7F5D99\",\"adjustedtimestamp\":\"SAT 08\\/18\\/2018 11:00:00\",\"adjustmenttype\":\"Interval Round\",\"id\":\"1871\",\"terminalid\":\"104\",\"punchtype\":\"CLOCK OUT\"}]}";
+        
+        JSONObject expected = (JSONObject)(JSONValue.parse(expectedJSON));
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(1420);
+        Badge b = db.getBadge(p.getBadge().getId());
+        Shift s = db.getShift(b);
+        
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, p.getOriginalTimestamp().toLocalDate(), s);
+        
+        /* JSON Conversion */
+        
+        String actualJSON = TAS.getPunchListPlusTotalsAsJSON(punchlist, s);
+        
+        JSONObject actual = (JSONObject)(JSONValue.parse(actualJSON));
+		
+        /* Compare to Expected JSON */
+        
+        assertEquals(expected, actual);
+        
+    }
+    
 }
